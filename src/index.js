@@ -15,7 +15,6 @@ export class Game extends PIXI.Application {
       color: 0xff11ff,
     };
     this._loader();
-    this._viewControler();
     document.body.appendChild(this.view);
   }
   _loader() {
@@ -41,11 +40,12 @@ export class Game extends PIXI.Application {
     }
   }
   builds(type) {
-    const title = new Page(this.config);
+    const config = this.config
+    const title = new Page(config);
     this.stage.addChild(title);
     this.buildTitle();
   }
 
-  buildTitle() {}
+  buildTitle() { }
 }
 new Game();
