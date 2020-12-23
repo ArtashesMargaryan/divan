@@ -40,12 +40,12 @@ export class Game extends PIXI.Application {
     }
   }
   builds(type) {
-    const config = this.config
+    const config = this.config;
     const title = new Page(config);
     this.stage.addChild(title);
     this.buildTitle();
   }
 
-  buildTitle() { }
+  buildTitle() {}
 }
 new Game();
