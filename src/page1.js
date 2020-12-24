@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 export class Page extends PIXI.Container {
-  constructor(config) {
+  constructor(config, pageNum) {
     super({
       width: config.width,
       height: config.height,
@@ -11,29 +11,35 @@ export class Page extends PIXI.Container {
     };
     this.config = config;
     this.pageControl(config);
-    this.build();
+    this.build(pageNum);
+    this.pageNum = pageNum;
+    console.warn(this.pageNum);
+  }
+
+  destroy() {
+    super.destroy({ children: true });
   }
 
   pageControl(config) {
     const { width, height } = config;
     this.minSizeWindow = Math.min(width, height);
     this.pageArea = width * height;
-    if (width >= height) {
+    if (width >= height - 250) {
       this.pageType = 'x';
     } else {
       this.pageType = 'y';
     }
   }
 
-  build() {
-    this.buildBasicContainer();
+  build(pageNum) {
+    this.buildBasicContainer(pageNum);
   }
 
-  buildBasicContainer() {
+  buildBasicContainer(pageNum) {
     this.buildTitleContainer();
     this.toCorrectTitle();
-    this.buildLeftContainerInCentrContainer(3);
-    this.buildRightContainer(3);
+    this.buildLeftContainer(pageNum);
+    this.buildRightContainer(pageNum);
     this.buildFuterContainer();
     this.printCordinats();
   }
@@ -47,11 +53,14 @@ export class Page extends PIXI.Container {
   }
 
   toCorrectTitle() {
-    const scaleTitle = this.minSizeWindow / (9 * this.title.height);
-    this.titleContenier.position.set(this.config.width / 2, 0.005 * this.config.height);
+    const scaleTitle = Math.min(
+      (this.config.width * 0.6) / this.title.width,
+      (this.config.height * 0.2) / this.title.height
+    );
+    this.titleContenier.position.set(this.config.width / 2, 0.01 * this.config.height);
 
     this.titleContenier.children.width = 50;
-    this.title.scale.set(scaleTitle, scaleTitle);
+    this.title.scale.set(scaleTitle);
   }
 
   buildContainer() {
@@ -59,7 +68,7 @@ export class Page extends PIXI.Container {
     return container;
   }
 
-  buildLeftContainerInCentrContainer(pageNum) {
+  buildLeftContainer(pageNum) {
     this.leftBox = new PIXI.Sprite.from(`${pageNum}b`);
     this.addChild(this.leftBox);
     this.leftBox.anchor.set(0.5);
