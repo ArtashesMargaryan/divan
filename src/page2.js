@@ -1,3 +1,8 @@
+/*** _viewControler() {
+    const img = PIXI.Sprite.from('title');
+    this.stage.addChild(img);
+
+    gsap.to(img, { alpha: 0, duration: 1, delay: 0.2 , ease: Expo.esou}); */
 import * as PIXI from 'pixi.js';
 export class Page extends PIXI.Container {
   constructor(config) {

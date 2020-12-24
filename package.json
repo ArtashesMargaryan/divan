@@ -24,6 +24,8 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
+    "gsap": "^3.5.1",
+    "pixi-tween": "^0.2.0",
     "pixi.js": "^5.3.6"
   }
 }

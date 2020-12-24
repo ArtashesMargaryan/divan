@@ -18,7 +18,7 @@ export class Page extends PIXI.Container {
     const { width, height } = config;
     this.minSizeWindow = Math.min(width, height);
     this.pageArea = width * height;
-    if (width > height) {
+    if (width >= height) {
       this.pageType = 'x';
     } else {
       this.pageType = 'y';
@@ -32,87 +32,121 @@ export class Page extends PIXI.Container {
   buildBasicContainer() {
     this.buildTitleContainer();
     this.toCorrectTitle();
-    this.buildCenterContainer();
-    this.buildLeftContainerInCentrContainer(1);
-    this.buildRightContainerInCentrContainer(1);
+    this.buildLeftContainerInCentrContainer(3);
+    this.buildRightContainer(3);
     this.buildFuterContainer();
+    this.printCordinats();
   }
 
   buildTitleContainer() {
     this.titleContenier = new PIXI.Container();
     const title = new PIXI.Sprite.from('title');
-    title.anchor.set(0.5);
+    title.anchor.set(0.5, 0);
     this.titleContenier.addChild((this.title = title));
     this.addChild(this.titleContenier);
   }
 
   toCorrectTitle() {
-    const scaleTitle = this.minSizeWindow / (7 * this.title.height);
-    this.titleContenier.position.set(
-      this.config.width / 2,
-      Math.max(this.title.height * scaleTitle, this.minSizeWindow / 12)
-    );
+    const scaleTitle = this.minSizeWindow / (9 * this.title.height);
+    this.titleContenier.position.set(this.config.width / 2, 0.005 * this.config.height);
+
     this.titleContenier.children.width = 50;
     this.title.scale.set(scaleTitle, scaleTitle);
   }
 
-  buildCenterContainer(numPage = 1) {
-    const centerContenier = new PIXI.Container();
-    centerContenier.position.set(
-      0,
-      this.minSizeWindow / (7 * this.title.height) + this.title.height + this.minSizeWindow / 7
-    );
-    this.addChild((this.centerContenier = centerContenier));
+  buildContainer() {
+    const container = new PIXI.Container();
+    return container;
   }
 
   buildLeftContainerInCentrContainer(pageNum) {
     this.leftBox = new PIXI.Sprite.from(`${pageNum}b`);
     this.addChild(this.leftBox);
     this.leftBox.anchor.set(0.5);
-    if (this.pageType === 'x') {
-      this.leftBox.y = (5 * this.config.height) / 9;
-      this.leftBox.x = this.config.width / 3;
-    } else {
-      this.leftBox.y = this.config.height / 3;
-      this.leftBox.x = this.config.width / 2;
-    }
+    this.scaleX = 1;
+    this.leftContainerToCorent();
   }
 
-  buildRightContainerInCentrContainer(pageNum) {
-    this.leftBox = new PIXI.Sprite.from(`${pageNum}a`);
-    this.addChild(this.leftBox);
-    this.leftBox.anchor.set(0.5);
+  leftContainerToCorent() {
     if (this.pageType === 'x') {
       this.leftBox.y = (5 * this.config.height) / 9;
-      this.leftBox.x = (2 * this.config.width) / 3;
+      this.leftBox.x = (2 * this.config.width) / 8;
+      const scaleX = this.config.width / (2 * this.leftBox.width);
+      const scaleY = this.config.height / (2 * this.leftBox.height);
+      this.scaleBox = Math.min(scaleY, scaleX);
     } else {
-      this.leftBox.y = (2 * this.config.height) / 3;
+      this.leftBox.y = (3 * this.config.height) / 8;
       this.leftBox.x = this.config.width / 2;
+      const scaleX = (2 * this.config.width) / (3 * this.leftBox.width);
+      this.scaleBox = scaleX;
     }
+
+    this.leftBox.scale.set(this.scaleBox);
   }
 
-  buildFuterContainer(width, height) {
-    const container = new PIXI.Container();
-    const style = new PIXI.TextStyle({
-      fontFamily: 'Arial',
-      fontSize: 36,
-      fill: ['0xffffff'],
-    });
+  buildRightContainer(pageNum) {
+    this.rightBox = new PIXI.Sprite.from(`${pageNum}a`);
+    const container = this.buildContainer();
+    container.addChild(this.rightBox);
+    container.interactive = true;
+    // container.addEventListener('pointerDown', () => {
+    //   console.warn('sd');
+    // });
+    this.rightBox.buttonMode = true;
+    this.rightBox.interactive = true;
+    this.addChild(container);
+    this.rightBox.anchor.set(0.5);
+    this.rightContainerToCorent();
+  }
+
+  boxClick() {}
+  rightContainerToCorent() {
+    if (this.pageType === 'x') {
+      this.rightBox.y = (5 * this.config.height) / 9;
+      this.rightBox.x = (6 * this.config.width) / 8;
+    } else {
+      this.rightBox.y = (7 * this.config.height) / 9;
+      this.rightBox.x = this.config.width / 2;
+    }
+    this.rightBox.scale.set(this.scaleBox);
+  }
+
+  buildFuterContainer() {
+    const container = this.buildContainer();
+    container.addChild(this.buildFuterRectang());
+    container.addChild(this.buildTextInFuter());
+    if (this.pageType === 'x') {
+      container.y = (8 * this.config.height) / 9;
+    } else {
+      container.y = (1 * this.config.height) / 8;
+    }
+    this.addChild(container);
+  }
+
+  buildFuterRectang() {
     const gr = new PIXI.Graphics();
     gr.beginFill(0x537f7e);
-    gr.drawRect(0, 0, this.config.width, this.config.height / 10);
-    const text = new PIXI.Text('Keep exploring the catalog!', style);
-    text.anchor.set(0.5, 0);
+    gr.drawRect(0, 0, this.config.width, Math.min(this.config.height / 12, 150));
+    return gr;
+  }
 
-    container.addChild(gr);
-    container.addChild(text);
-    if (this.pageType === 'x') {
-      container.y = (7 * this.config.height) / 9;
-    } else {
-      container.y = (2 * this.config.height) / 9;
-    }
+  buildTextInFuter() {
+    const style = new PIXI.TextStyle({
+      fontFamily: 'Covet-Bold',
+      fontSize: Math.min(this.config.height / 12, 150) / 2,
+      fill: ['0xffffff'],
+    });
+    const text = new PIXI.Text('Keep exploring the catalog!', style);
+    text.anchor.set(0.5, -0.25);
     text.x = this.config.width / 2;
-    this.addChild(container);
+    return text;
+  }
+
+  printCordinats() {
+    const arr = [];
+    arr.push(this.leftBox.position);
+    arr.push(this.rightBox.position);
+    return arr;
   }
   toCorrectFuter() {
     // const { width, height } = this.config;
