@@ -31,6 +31,7 @@ export class Game extends PIXI.Application {
       height: this.pageHeight,
       color: 0xff11ff,
     };
+    pageNum = 1;
     this.renderer.resize(window.innerWidth, window.innerHeight);
     this.builds(pageNum);
   }
@@ -46,7 +47,7 @@ export class Game extends PIXI.Application {
     this.loader.add('3a', 'assets/furniture/3a.png');
     this.loader.add('3b', 'assets/furniture/3b.png');
     this.loader.load(() => {
-      this._rebuildStage();
+      this._rebuildStage(2);
     });
   }
 
@@ -64,7 +65,7 @@ export class Game extends PIXI.Application {
 
   buildHand() {
     const hand = new PIXI.Sprite.from('hand');
-    hand.position.set(this.boxPos[0].x, this.boxPos[0].y);
+    hand.position.set(this.boxPos[0].x, this.boxPos[0].y + 1000);
     this.stage.addChild((this.hand = hand));
     // let gsapLine1 = gsap.to(hand, { direction: 4, x: this.boxPos[0].x, y: this.boxPos[0].y });
     this.animation(hand);
@@ -73,11 +74,14 @@ export class Game extends PIXI.Application {
   }
   animation(hand) {
     const tl = gsap.timeline({ repeat: -1, repeatDelay: 1 });
-    tl.to(hand, { x: this.boxPos[0].x, y: this.boxPos[0].y, duration: 2 });
-    tl.to(hand, { pixi: { scaleX: 0.5, scaleY: 0.5 }, duration: 3, yoyo: true });
-    tl.to(hand, { x: this.boxPos[1].x, y: this.boxPos[1].y + 1, duration: 2 });
+    tl.to(hand, { x: this.boxPos[1].x, y: this.boxPos[1].y + 1, ease: Bounce, duration: 1, yoyo: true });
     tl.to(hand, { pixi: { scaleX: 0.5, scaleY: 0.5 }, duration: 1 });
-    tl.to(hand, { opacity: 0, duration: 1 });
+    tl.to(hand, { pixi: { scaleX: 1, scaleY: 1 }, duration: 1 });
+    tl.to(hand, { x: this.boxPos[0].x, y: this.boxPos[0].y, duration: 1 });
+    tl.to(hand, { pixi: { scaleX: 0.5, scaleY: 0.5 }, duration: 1 });
+    tl.to(hand, { pixi: { scaleX: 1, scaleY: 1 }, duration: 1 });
+    // tl.to(hand, { pixi: { scaleX: 0, scaleY: 0 }, duration: 1 });
+    tl.to(hand, { pixi: { alpha: 0, scaleX: 0.5, scaleY: 0.5 }, duration: 0.5 });
 
     // tl.resume();
 

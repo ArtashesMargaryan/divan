@@ -1,4 +1,6 @@
 import * as PIXI from 'pixi.js';
+import { gsap, Bounce } from 'gsap';
+import { PixiPlugin } from 'gsap/PixiPlugin';
 export class Page extends PIXI.Container {
   constructor(config, pageNum) {
     super({
@@ -24,7 +26,7 @@ export class Page extends PIXI.Container {
     const { width, height } = config;
     this.minSizeWindow = Math.min(width, height);
     this.pageArea = width * height;
-    if (width >= height - 250) {
+    if (width >= height) {
       this.pageType = 'x';
     } else {
       this.pageType = 'y';
@@ -54,8 +56,8 @@ export class Page extends PIXI.Container {
 
   toCorrectTitle() {
     const scaleTitle = Math.min(
-      (this.config.width * 0.6) / this.title.width,
-      (this.config.height * 0.2) / this.title.height
+      (this.config.width * 0.41) / this.title.width,
+      (this.config.height * 0.18) / this.title.height
     );
     this.titleContenier.position.set(this.config.width / 2, 0.01 * this.config.height);
 
@@ -65,12 +67,18 @@ export class Page extends PIXI.Container {
 
   buildContainer() {
     const container = new PIXI.Container();
+    container.addEventLisener;
     return container;
   }
 
   buildLeftContainer(pageNum) {
+    const leftContainer = new PIXI.Container();
     this.leftBox = new PIXI.Sprite.from(`${pageNum}b`);
-    this.addChild(this.leftBox);
+    leftContainer.addChild(this.leftBox);
+    leftContainer.interactive = true;
+    leftContainer.on('pointerup', this.toNextPage.bind(this));
+
+    this.addChild(leftContainer);
     this.leftBox.anchor.set(0.5);
     this.scaleX = 1;
     this.leftContainerToCorent();
@@ -86,7 +94,7 @@ export class Page extends PIXI.Container {
     } else {
       this.leftBox.y = (3 * this.config.height) / 8;
       this.leftBox.x = this.config.width / 2;
-      const scaleX = (2 * this.config.width) / (3 * this.leftBox.width);
+      const scaleX = (4 * this.config.width) / (7 * this.leftBox.width);
       this.scaleBox = scaleX;
     }
 
@@ -108,7 +116,6 @@ export class Page extends PIXI.Container {
     this.rightContainerToCorent();
   }
 
-  boxClick() {}
   rightContainerToCorent() {
     if (this.pageType === 'x') {
       this.rightBox.y = (5 * this.config.height) / 9;
@@ -122,8 +129,9 @@ export class Page extends PIXI.Container {
 
   buildFuterContainer() {
     const container = this.buildContainer();
-    container.addChild(this.buildFuterRectang());
-    container.addChild(this.buildTextInFuter());
+    this.rectangl = this.buildFuterRectang();
+    container.addChild(this.rectangl);
+    container.addChild(this.buildTextInFuter(this.rectangl.height, this.rectangl.width));
     if (this.pageType === 'x') {
       container.y = (8 * this.config.height) / 9;
     } else {
@@ -139,14 +147,15 @@ export class Page extends PIXI.Container {
     return gr;
   }
 
-  buildTextInFuter() {
+  buildTextInFuter(fontMaxW, fontMaxH) {
+    const textStr = 'Keep exploring the catalog!';
     const style = new PIXI.TextStyle({
       fontFamily: 'Covet-Bold',
-      fontSize: Math.min(this.config.height / 12, 150) / 2,
+      fontSize: Math.min(0.8 * fontMaxH, (10 * fontMaxW) / textStr.length),
       fill: ['0xffffff'],
     });
-    const text = new PIXI.Text('Keep exploring the catalog!', style);
-    text.anchor.set(0.5, -0.25);
+    const text = new PIXI.Text(textStr, style);
+    text.anchor.set(0.5, -0.5);
     text.x = this.config.width / 2;
     return text;
   }
@@ -157,11 +166,18 @@ export class Page extends PIXI.Container {
     arr.push(this.rightBox.position);
     return arr;
   }
-  toCorrectFuter() {
-    // const { width, height } = this.config;
-    // this.titleContenier.position.set(width / 2, Math.max(height / 7, 50));
-    // this.titleContenier.children.width = 50;
-    // console.warn(this.titleContenier.children);
-    // this.title.scale.set(0.8, 0.8);
+  toNextPage() {
+    console.warn(this.pageNum);
+    const prom = new Promise((resolv) => {
+      if (this.pageNum < 3) {
+        this.pageNum++;
+      } else {
+        return;
+      }
+      resolv();
+    });
+    prom.then(() => {
+      this.buildBasicContainer(this.pageNum);
+    });
   }
 }
