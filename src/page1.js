@@ -1,6 +1,8 @@
 import * as PIXI from 'pixi.js';
 import { gsap, Bounce } from 'gsap';
 import { PixiPlugin } from 'gsap/PixiPlugin';
+import { getEmitter } from './game';
+
 export class Page extends PIXI.Container {
   constructor(config, pageNum) {
     super({
@@ -11,11 +13,14 @@ export class Page extends PIXI.Container {
     this.scaleVal = {
       title: [[0.8, 0.8]],
     };
+    gsap.registerPlugin(PixiPlugin);
+    PixiPlugin.registerPIXI(PIXI);
     this.config = config;
     this.pageControl(config);
     this.build(pageNum);
     this.pageNum = pageNum;
-    console.warn(this.pageNum);
+    this.arrPos = [];
+    this.emitter = getEmitter();
   }
 
   destroy() {
@@ -38,12 +43,19 @@ export class Page extends PIXI.Container {
   }
 
   buildBasicContainer(pageNum) {
+    if (pageNum > 1) {
+      this.emitter.emit('handPaus');
+    }
+    if (pageNum > 3) {
+      console.warn('sasa');
+      this.emitter.emit('theAnd');
+      return;
+    }
     this.buildTitleContainer();
     this.toCorrectTitle();
     this.buildLeftContainer(pageNum);
     this.buildRightContainer(pageNum);
     this.buildFuterContainer();
-    this.printCordinats();
   }
 
   buildTitleContainer() {
@@ -60,40 +72,42 @@ export class Page extends PIXI.Container {
       (this.config.height * 0.18) / this.title.height
     );
     this.titleContenier.position.set(this.config.width / 2, 0.01 * this.config.height);
-
     this.titleContenier.children.width = 50;
     this.title.scale.set(scaleTitle);
   }
 
   buildContainer() {
     const container = new PIXI.Container();
-    container.addEventLisener;
+    container.interactive = true;
+
+    container.on('pointerup', this.toNextPage.bind(this, container));
+
     return container;
   }
 
   buildLeftContainer(pageNum) {
-    const leftContainer = new PIXI.Container();
+    const leftContainer = this.buildContainer();
+    leftContainer.pat = 1;
     this.leftBox = new PIXI.Sprite.from(`${pageNum}b`);
     leftContainer.addChild(this.leftBox);
-    leftContainer.interactive = true;
-    leftContainer.on('pointerup', this.toNextPage.bind(this));
+    // leftContainer.on('pointerup', this.toNextPage.bind(this));
 
     this.addChild(leftContainer);
     this.leftBox.anchor.set(0.5);
     this.scaleX = 1;
-    this.leftContainerToCorent();
+    this.leftContainerToCorent(leftContainer);
   }
 
-  leftContainerToCorent() {
+  leftContainerToCorent(leftContainer) {
     if (this.pageType === 'x') {
-      this.leftBox.y = (5 * this.config.height) / 9;
-      this.leftBox.x = (2 * this.config.width) / 8;
-      const scaleX = this.config.width / (2 * this.leftBox.width);
-      const scaleY = this.config.height / (2 * this.leftBox.height);
+      leftContainer.y = (5 * this.config.height) / 9;
+      leftContainer.x = (2 * this.config.width) / 8;
+      const scaleX = (2 * this.config.width) / (5 * this.leftBox.width);
+      const scaleY = (2 * this.config.height) / (5 * this.leftBox.height);
       this.scaleBox = Math.min(scaleY, scaleX);
     } else {
-      this.leftBox.y = (3 * this.config.height) / 8;
-      this.leftBox.x = this.config.width / 2;
+      leftContainer.y = (3 * this.config.height) / 8;
+      leftContainer.x = this.config.width / 2;
       const scaleX = (4 * this.config.width) / (7 * this.leftBox.width);
       this.scaleBox = scaleX;
     }
@@ -102,28 +116,29 @@ export class Page extends PIXI.Container {
   }
 
   buildRightContainer(pageNum) {
+    const rightCont = this.buildContainer();
+    rightCont.pat = 1;
     this.rightBox = new PIXI.Sprite.from(`${pageNum}a`);
-    const container = this.buildContainer();
-    container.addChild(this.rightBox);
-    container.interactive = true;
+    rightCont.addChild(this.rightBox);
     // container.addEventListener('pointerDown', () => {
     //   console.warn('sd');
     // });
     this.rightBox.buttonMode = true;
     this.rightBox.interactive = true;
-    this.addChild(container);
+    this.addChild(rightCont);
     this.rightBox.anchor.set(0.5);
-    this.rightContainerToCorent();
+    this.rightContainerToCorent(rightCont);
   }
 
-  rightContainerToCorent() {
+  rightContainerToCorent(rightCont) {
     if (this.pageType === 'x') {
-      this.rightBox.y = (5 * this.config.height) / 9;
-      this.rightBox.x = (6 * this.config.width) / 8;
+      rightCont.y = (5 * this.config.height) / 9;
+      rightCont.x = (6 * this.config.width) / 8;
     } else {
-      this.rightBox.y = (7 * this.config.height) / 9;
-      this.rightBox.x = this.config.width / 2;
+      rightCont.y = (7 * this.config.height) / 9;
+      rightCont.x = this.config.width / 2;
     }
+
     this.rightBox.scale.set(this.scaleBox);
   }
 
@@ -161,23 +176,69 @@ export class Page extends PIXI.Container {
   }
 
   printCordinats() {
-    const arr = [];
-    arr.push(this.leftBox.position);
-    arr.push(this.rightBox.position);
-    return arr;
+    const arr = this.children.filter((child) => child.pat === 1);
+    const arr1 = [
+      [arr[0].x, arr[0].y],
+      [arr[1].x, arr[1].y],
+    ];
+    return arr1;
   }
-  toNextPage() {
-    console.warn(this.pageNum);
-    const prom = new Promise((resolv) => {
-      if (this.pageNum < 3) {
-        this.pageNum++;
-      } else {
-        return;
-      }
-      resolv();
+
+  toNextPage(container) {
+    console.warn(this);
+    this.children.forEach((child) => {
+      child.removeAllListeners();
     });
-    prom.then(() => {
-      this.buildBasicContainer(this.pageNum);
+    if (this.pageNum <= 3) {
+      const prom = new Promise((resolv) => {
+        this.emitter.emit('handPaus');
+        this.pageNum++;
+        this.liking(container);
+        setTimeout(() => {
+          resolv();
+        }, 800);
+      }).then(() => {
+        const prom = new Promise((resolv) => {
+          this.clearCentrContaner();
+          resolv;
+        });
+      });
+    } else {
+      return;
+    }
+  }
+
+  clearCentrContaner() {
+    const arr = this.children.filter((child) => child.pat === 1);
+    arr.forEach((child) => {
+      child.destroy();
+    });
+    this.buildBasicContainer(this.pageNum);
+    return;
+  }
+
+  liking(container) {
+    const x = container.x;
+    const y = container.y;
+    this.buildLike(x, y);
+  }
+
+  buildLike(x, y) {
+    console.warn(x, y);
+    const like = new PIXI.Sprite.from('like');
+    like.position.set(x, y);
+    like.anchor.set(0.5);
+    like.scale.set(0.5);
+    this.addChild(like);
+    const tl = gsap.timeline({ repeat: 0, repeatDelay: 1 });
+    tl.to(like, { pixi: { scaleX: 1, scaleY: 1 }, duration: 0.3 });
+    tl.to(like, { pixi: { scaleX: 1, scaleY: 1 }, duration: 0.3 });
+    tl.to(like, {
+      pixi: { scaleX: 0.1, scaleY: 0.1 },
+      duration: 0.3,
+      onComplete: () => {
+        this.removeChild(like);
+      },
     });
   }
 }
