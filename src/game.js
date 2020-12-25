@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { Page } from './page1';
+import { LastPage } from './page2';
 import { gsap, Bounce } from 'gsap';
 import { PixiPlugin } from 'gsap/PixiPlugin';
 import Emitter from 'eventemitter3';
@@ -67,6 +68,8 @@ export class Game extends PIXI.Application {
   }
 
   builds(pageNum) {
+    this.buildLastPage();
+    return;
     this.buildBoard(pageNum);
     this.buildHand();
   }
@@ -131,9 +134,8 @@ export class Game extends PIXI.Application {
     this.buildLastPage();
   }
   buildLastPage() {
-    return;
     const config = this.config;
-    const board = new LastPage(config, pageNum);
+    const board = new LastPage(config);
     this.stage.addChild(board);
   }
 }

@@ -4,7 +4,7 @@ import { PixiPlugin } from 'gsap/PixiPlugin';
 import { getEmitter } from './game';
 
 export class LastPage extends PIXI.Container {
-  constructor(config, pageNum) {
+  constructor(config) {
     super({
       width: config.width,
       height: config.height,
@@ -15,7 +15,7 @@ export class LastPage extends PIXI.Container {
     PixiPlugin.registerPIXI(PIXI);
     this.config = config;
     this.build();
-    this.pageNum = pageNum;
+
     this.arrPos = [];
     this.emitter = getEmitter();
   }
@@ -36,15 +36,8 @@ export class LastPage extends PIXI.Container {
   }
 
   build() {
-    this.buildBasicContainer();
-  }
-
-  buildBasicContainer() {
     this.buildTitleContainer();
     this.toCorrectTitle();
-    this.buildLeftContainer(pageNum);
-    this.buildRightContainer(pageNum);
-    this.buildFuterContainer();
   }
 
   buildTitleContainer() {
@@ -56,21 +49,18 @@ export class LastPage extends PIXI.Container {
   }
 
   toCorrectTitle() {
+    if (this.pageType === 'x') {
+    }
     const scaleTitle = Math.min(
-      (this.config.width * 0.41) / this.title.width,
-      (this.config.height * 0.18) / this.title.height
+      this.config.width / 3 / this.title.width,
+      (this.config.height * 0.4) / this.title.height
     );
-    this.titleContenier.position.set(this.config.width / 2, 0.01 * this.config.height);
+    this.titleContenier.position.set(this.config.width / 2, 0.18 * this.config.height);
     this.titleContenier.children.width = 50;
     this.title.scale.set(scaleTitle);
   }
 
-  buildContainer() {
-    const container = new PIXI.Container();
-    container.interactive = true;
-
-    container.on('pointerup', this.toNextPage.bind(this, container));
-
-    return container;
+  buldLeft() {
+    const leftContainer = new PIXI.Container();
   }
 }
