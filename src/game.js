@@ -19,11 +19,9 @@ export class Game extends PIXI.Application {
 
     gsap.registerPlugin(PixiPlugin);
     PixiPlugin.registerPIXI(PIXI);
-
     document.body.appendChild(this.view);
     window.addEventListener('resize', this._rebuildStage.bind(this));
     window.addEventListener('orientationchange', this._rebuildStage.bind(this));
-
     this._startLoading();
     this.emitterControl();
   }
@@ -62,6 +60,8 @@ export class Game extends PIXI.Application {
     this.loader.add('4b', 'assets/ui/cta_apt2b_melrose_sofa_half.png');
     this.loader.add('4c', 'assets/ui/cta_apt2b_scott_sofa_half.png');
     this.loader.add('4d', 'assets/ui/cta_dwr_bantam73_sofa_half.png');
+    this.loader.add('button1', 'assets/ui/button.png');
+    this.loader.add('button2', 'assets/ui/button2.png');
     this.loader.load(() => {
       this._rebuildStage(2);
     });
@@ -94,7 +94,6 @@ export class Game extends PIXI.Application {
   animation(hand) {
     gsap.to(hand, { pixi: { scaleX: 1, scaleY: 1 }, duration: 0.000001 });
     if (this.boxPos) {
-      console.warn(this.boxPos);
     }
     const tl = gsap.timeline({ repeat: -1, repeatDelay: 1, delay: 2 });
     tl.to(hand, {
@@ -113,14 +112,8 @@ export class Game extends PIXI.Application {
     // tl.to(hand, { pixi: { scaleX: 0, scaleY: 0 }, duration: 1 });
     tl.to(hand, { pixi: { alpha: 0, scaleX: 0.5, scaleY: 0.5 }, duration: 0.5 });
     this.tl = tl;
-    // tl.resume();
-
-    // setTimeout(() => {
-    //   gsap.killTweensOf(hand);
-    // }, 3000);
   }
   handAnimStop() {
-    console.warn('stop');
     gsap.killTweensOf(this.hand);
     gsap.to(this.hand, { pixi: { alpha: 0 } });
     this.animation(this.hand);

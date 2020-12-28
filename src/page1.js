@@ -13,9 +13,27 @@ export class Page extends PIXI.Container {
     this.scaleVal = {
       title: [[0.8, 0.8]],
     };
+    this.text = {
+      1: {
+        0: ' KKH \n13131',
+        1: 'Wolds Away \n   Janny S',
+      },
+      2: {
+        0: 'xjjkjc\njnj',
+        1: 'dsfjhjhzhvj',
+      },
+      3: {
+        0: 'kjdcgxxzvc',
+        1: 'dfgdb',
+      },
+    };
+    this.config = config;
+    this.style = {
+      algin: 'centr',
+      fontSize: this.config.height / 40,
+    };
     gsap.registerPlugin(PixiPlugin);
     PixiPlugin.registerPIXI(PIXI);
-    this.config = config;
     this.pageControl(config);
     this.build(pageNum);
     this.pageNum = pageNum;
@@ -90,7 +108,9 @@ export class Page extends PIXI.Container {
     leftContainer.pat = 1;
     this.leftBox = new PIXI.Sprite.from(`${pageNum}b`);
     leftContainer.addChild(this.leftBox);
-    // leftContainer.on('pointerup', this.toNextPage.bind(this));
+    this.leftText = new PIXI.Text(`${this.text[pageNum][0]}`, this.style);
+    leftContainer.addChild(this.leftText);
+    this.leftText.anchor.set(0.5, 0);
 
     this.addChild(leftContainer);
     this.leftBox.anchor.set(0.5);
@@ -112,6 +132,7 @@ export class Page extends PIXI.Container {
       this.scaleBox = scaleX;
     }
 
+    this.leftText.y = (this.scaleBox * this.leftBox.height) / 2;
     this.leftBox.scale.set(this.scaleBox);
   }
 
@@ -120,9 +141,9 @@ export class Page extends PIXI.Container {
     rightCont.pat = 1;
     this.rightBox = new PIXI.Sprite.from(`${pageNum}a`);
     rightCont.addChild(this.rightBox);
-    // container.addEventListener('pointerDown', () => {
-    //   console.warn('sd');
-    // });
+    this.rightText = new PIXI.Text(`${this.text[pageNum][1]}`, this.style);
+    rightCont.addChild(this.rightText);
+    this.rightText.anchor.set(0.5, 0);
     this.rightBox.buttonMode = true;
     this.rightBox.interactive = true;
     this.addChild(rightCont);
@@ -138,17 +159,18 @@ export class Page extends PIXI.Container {
       rightCont.y = (7 * this.config.height) / 9;
       rightCont.x = this.config.width / 2;
     }
-
+    this.rightText.y = (this.scaleBox * this.rightBox.height) / 2;
     this.rightBox.scale.set(this.scaleBox);
+    return this.scaleBox;
   }
 
   buildFuterContainer() {
-    const container = this.buildContainer();
+    const container = new PIXI.Container();
     this.rectangl = this.buildFuterRectang();
     container.addChild(this.rectangl);
     container.addChild(this.buildTextInFuter(this.rectangl.height, this.rectangl.width));
     if (this.pageType === 'x') {
-      container.y = (8 * this.config.height) / 9;
+      container.y = this.config.height - container.height;
     } else {
       container.y = (1 * this.config.height) / 8;
     }
@@ -193,15 +215,9 @@ export class Page extends PIXI.Container {
       const prom = new Promise((resolv) => {
         this.emitter.emit('handPaus');
         this.pageNum++;
-        this.liking(container);
-        setTimeout(() => {
-          resolv();
-        }, 800);
+        this.liking(container, resolv);
       }).then(() => {
-        const prom = new Promise((resolv) => {
-          this.clearCentrContaner();
-          resolv;
-        });
+        this.clearCentrContaner();
       });
     } else {
       return;
@@ -217,19 +233,10 @@ export class Page extends PIXI.Container {
     return;
   }
 
-  liking(container) {
+  liking(container, onCompleteCallBack) {
     const x = container.x;
     const y = container.y;
-    this.buildLike(x, y);
-  }
-
-  buildLike(x, y) {
-    console.warn(x, y);
-    const like = new PIXI.Sprite.from('like');
-    like.position.set(x, y);
-    like.anchor.set(0.5);
-    like.scale.set(0.5);
-    this.addChild(like);
+    const like = this.buildLike(x, y, onCompleteCallBack);
     const tl = gsap.timeline({ repeat: 0, repeatDelay: 1 });
     tl.to(like, { pixi: { scaleX: 1, scaleY: 1 }, duration: 0.3 });
     tl.to(like, { pixi: { scaleX: 1, scaleY: 1 }, duration: 0.3 });
@@ -238,7 +245,18 @@ export class Page extends PIXI.Container {
       duration: 0.3,
       onComplete: () => {
         this.removeChild(like);
+        onCompleteCallBack();
       },
     });
+
+    this.addChild(like);
+  }
+
+  buildLike(x, y, onCompleteCallBack) {
+    const like = new PIXI.Sprite.from('like');
+    like.position.set(x, y);
+    like.anchor.set(0.5);
+    like.scale.set(0.5);
+    return like;
   }
 }
