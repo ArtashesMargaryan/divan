@@ -61,7 +61,7 @@ export class Game extends PIXI.Application {
     this.loader.add('4c', 'assets/ui/cta_apt2b_scott_sofa_half.png');
     this.loader.add('4d', 'assets/ui/cta_dwr_bantam73_sofa_half.png');
     this.loader.add('button1', 'assets/ui/button.png');
-    this.loader.add('button2', 'assets/ui/button2.png');
+    this.loader.add('button2', 'assets/ui/button1.png');
     this.loader.load(() => {
       this._rebuildStage(2);
     });

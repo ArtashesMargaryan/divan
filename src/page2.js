@@ -41,9 +41,9 @@ export class LastPage extends PIXI.Container {
   build() {
     this.buildTitleContainer();
     this.toCorrectTitle();
-    this.buildLeft();
-    this.buildRight();
-    this.buildButtons();
+    this.buildDivan();
+    this.buildButtonsPlay();
+    this.buildButtonsRetry();
   }
 
   buildTitleContainer() {
@@ -58,6 +58,14 @@ export class LastPage extends PIXI.Container {
     const timeLine = gsap.timeline({ repeat: -1, repeatDelay: 1 });
     timeLine.to(buton, { pixi: { scaleX: 1.2, scaleY: 1.2, pivotX: 0.5 }, duration: 0.3 });
     timeLine.to(buton, { pixi: { scaleX: 0.9, scaleY: 0.9 }, duration: 0.3 });
+  }
+
+  buildDivan() {
+    if (this.pageType === 'x') {
+      this.buildDivanAlbum();
+    } else {
+      this.buildDivansPortret();
+    }
   }
 
   toCorrectTitle() {
@@ -82,101 +90,105 @@ export class LastPage extends PIXI.Container {
     }
   }
 
-  buildButtons() {
-    const cont = new PIXI.Container();
+  buildButtonsPlay() {
+    const container = new PIXI.Container();
     const buttonPlay = PIXI.Sprite.from('button1');
-    buttonPlay.anchor.set(0.5, 0);
+    buttonPlay.anchor.set(0.5, 0.5);
+    container.addChild(buttonPlay);
+    container.x = this.config.width / 2;
     this.butonAnim(buttonPlay);
-    cont.addChild(buttonPlay);
-    cont.positionx = this.config.width / 2;
-    // cont.anchor.set(0.5, 0)
+    this.addChild((this.playBtn = container));
     if (this.pageType === 'x') {
-      buttonPlay.x = this.config.width / 2;
-      buttonPlay.y = (3 / 5) * this.config.height;
+      container.y = this.config.height / 2;
     } else {
+      container.y = this.config.height - container.height;
     }
-    this.addChild(cont);
   }
 
-  buildLeft() {
-    const divan = new SofaComponent('4a', [0, 1]);
-    this.addChild(divan);
-    console.warn(divan.width);
-    return;
-    const leftTopContainer = this.buildLeftUpContainer();
-    const leftBotomContainer = this.buildLeftDownContainer();
-    let scaleLeftUp;
-    let scaleLeftDown;
-    leftBotomContainer.anchor.set(0, 1);
+  buildButtonsRetry() {
+    const container = new PIXI.Container();
+    const buttonRettry = PIXI.Sprite.from('button2');
+    buttonRettry.anchor.set(0.5, 0.5);
+    container.addChild(buttonRettry);
+    container.x = this.config.width / 2;
+    this.addChild((this.retryBtn = container));
     if (this.pageType === 'x') {
-      leftTopContainer.y = this.titleContenier.y;
-      leftBotomContainer.y = (4 / 5) * this.config.height;
-      scaleLeftUp = this.toCorentScale(leftTopContainer);
-      scaleLeftDown = this.toCorentScale(leftBotomContainer);
+      container.y = this.config.height / 2 + this.playBtn.height + container.height;
     } else {
-      leftTopContainer.y = this.titleContenier.y + this.titleContenier.height + this.config.height * 0.1;
-      leftBotomContainer.y = 0.2 * this.config.height + leftTopContainer.y + leftTopContainer.height;
-      scaleLeftUp = this.toCorentScale(leftTopContainer);
-      scaleLeftDown = this.toCorentScale(leftBotomContainer);
+      container.y = this.config.height - this.playBtn.height - container.height;
     }
-    leftTopContainer.scale.set(scaleLeftUp);
-    leftBotomContainer.scale.set(scaleLeftDown);
-    // console.warn(leftTopContainer);
-    this.addChild(leftTopContainer);
-    this.addChild(leftBotomContainer);
   }
 
-  buildLeftUpContainer() {
-    const divanLeftUp = new PIXI.Sprite.from('4a');
-    const leftContUp = new PIXI.Container();
-    return leftContUp.addChild(divanLeftUp);
+  buildDivanAlbum() {
+    const divan1 = new SofaComponent('4a', [-1, 0, 2, 0]);
+    this.addChild(divan1);
+    divan1.editPosition(0, 0.18 * this.config.height);
+    gsap.to(divan1, {
+      pixi: { x: this.config.width / 2 - (2 * this.title.width) / 3, y: 0.18 * this.config.height },
+      duration: 1,
+    });
+
+    const divan2 = new SofaComponent('4b', [-1, 0, 2, 0]);
+    this.addChild(divan2);
+    divan2.editPosition(0, (3 * this.config.height) / 5);
+    gsap.to(divan2, {
+      pixi: { x: this.config.width / 2 - (2 * this.title.width) / 3, y: (3 * this.config.height) / 5 },
+      duration: 1,
+    });
+
+    const divan3 = new SofaComponent('4c', [-1, 0, 2, 0]);
+    this.addChild(divan3);
+    divan3.editPosition(this.config.width + divan3.width, 0.18 * this.config.height);
+    gsap.to(divan3, {
+      pixi: { x: this.config.width / 2 + (2 * this.title.width) / 3 + divan3.width, y: 0.18 * this.config.height },
+      duration: 1,
+    });
+
+    const divan4 = new SofaComponent('4d', [-1, 0, 2, 0]);
+    this.addChild(divan4);
+    divan4.editPosition(this.config.width + divan4.width, (3 * this.config.height) / 5);
+    gsap.to(divan4, {
+      pixi: { x: this.config.width / 2 + (2 * this.title.width) / 3 + divan4.width, y: (3 * this.config.height) / 5 },
+      duration: 1,
+    });
+  }
+  /***0.45 and 0.3 push in config */
+  buildDivansPortret() {
+    const w = this.config.width * 0.45;
+    const h = this.config.height * 0.3;
+    const divan1 = new SofaComponent('4a', [-1, 0, 2, 0]);
+    this.addChild(divan1);
+    divan1.editPosition(0, h);
+    gsap.to(divan1, { pixi: { x: w, y: h }, duration: 1 });
+    this.checkItem(divan1, 0.45, 0.3);
+    const divan2 = new SofaComponent('4b', [-1, 0, 2, 0]);
+    this.addChild(divan2);
+    divan2.editPosition(0, (3 * this.config.height) / 5);
+    gsap.to(divan2, { pixi: { x: w, y: (3 * this.config.height) / 5 }, duration: 1 });
+
+    const divan3 = new SofaComponent('4c', [-1, 0, 2, 0]);
+    this.addChild(divan3);
+    divan3.editPosition(this.config.width + divan3.width, h);
+    gsap.to(divan3, {
+      pixi: { x: 0.55 * this.config.width + divan3.width, y: h },
+      duration: 1,
+    });
+
+    const divan4 = new SofaComponent('4d', [-1, 0, 2, 0]);
+    this.addChild(divan4);
+    divan4.editPosition(this.config.width + divan4.width, (3 * this.config.height) / 5);
+    gsap.to(divan4, {
+      pixi: { x: 0.55 * this.config.width + divan3.width, y: (3 * this.config.height) / 5 },
+      duration: 1,
+    });
   }
 
-  buildLeftDownContainer() {
-    const divanLeftDown = new PIXI.Sprite.from('4b');
-    const leftContDown = new PIXI.Container();
-    return leftContDown.addChild(divanLeftDown);
-  }
-
-  buildRight() {
-    return;
-    const rigtTopContainer = this.buildRightUpContainer();
-    const rightBotomContainer = this.buildRightDownContainer();
-    rigtTopContainer.anchor.set(1, 0);
-    rigtTopContainer.x = this.config.width;
-    rightBotomContainer.anchor.set(1, 1);
-    rightBotomContainer.x = this.config.width;
-
-    let scaleRightUp;
-    let scaleRightDown;
-    if (this.pageType === 'x') {
-      rigtTopContainer.y = this.titleContenier.y;
-      rightBotomContainer.y = (4 / 5) * this.config.height;
-      scaleRightUp = this.toCorentScale(rigtTopContainer);
-      scaleRightDown = this.toCorentScale(rightBotomContainer);
-    } else {
-      rigtTopContainer.y = this.titleContenier.y + this.titleContenier.height + this.config.height * 0.1;
-      rightBotomContainer.y = 0.2 * this.config.height + rigtTopContainer.y + rigtTopContainer.height;
-      scaleRightUp = this.toCorentScale(rigtTopContainer);
-      scaleRightDown = this.toCorentScale(rightBotomContainer);
+  checkItem(item, xScale, yScale) {
+    const { width, height } = this.config;
+    if (item.width * 0.55 <= width * xScale && item.height <= height.yScale) {
+      return;
     }
-    rightBotomContainer.scale.set(scaleRightUp);
-    rigtTopContainer.scale.set(scaleRightDown);
-    this.addChild(rigtTopContainer);
-    this.addChild(rightBotomContainer);
-  }
-
-  buildRightUpContainer() {
-    const divanRightUp = new PIXI.Sprite.from('4d');
-    const rightContUp = new PIXI.Container();
-
-    return rightContUp.addChild(divanRightUp);
-  }
-
-  buildRightDownContainer() {
-    const divanRightDown = new PIXI.Sprite.from('4c');
-    const rightTopContainer = new PIXI.Container();
-    return rightTopContainer.addChild(divanRightDown);
+    item.scale.set(Math.min(((xScale * width) / item.width, (yScale * height) / item.height)));
   }
 
   toCorentScale(obj) {
