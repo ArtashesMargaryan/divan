@@ -76,8 +76,8 @@ export class LastPage extends PIXI.Container {
   }
   butonAnim(buton) {
     const timeLine = gsap.timeline({ repeat: -1, repeatDelay: 1 });
-    timeLine.to(buton, { pixi: { scaleX: 1.2, scaleY: 1.2, pivotX: 0.5 }, duration: 0.3 });
-    timeLine.to(buton, { pixi: { scaleX: 0.9, scaleY: 0.9 }, duration: 0.3 });
+    timeLine.to(buton, { pixi: { scaleX: 1.2, scaleY: 1.2, pivotX: 0.5 }, duration: 0.5 });
+    timeLine.to(buton, { pixi: { scaleX: 0.9, scaleY: 0.9 }, duration: 0.5 });
   }
   buildFuterContainer() {
     const container = new PIXI.Container();
@@ -183,9 +183,10 @@ export class LastPage extends PIXI.Container {
     this.butonAnim(buttonPlay);
     this.addChild((this.playBtn = container));
     if (this.pageType === 'x') {
+      container.scale.set((0.28 * this.config.width) / container.width);
       container.y = this.config.height / 2;
     } else {
-      container.y = this.config.height - container.height;
+      container.y = 0.82 * this.config.height;
     }
   }
 
@@ -200,9 +201,11 @@ export class LastPage extends PIXI.Container {
     container.x = this.config.width / 2;
     this.addChild((this.retryBtn = container));
     if (this.pageType === 'x') {
+      container.scale.set((0.24 * this.config.width) / container.width);
+
       container.y = this.config.height / 2 + this.playBtn.height + container.height;
     } else {
-      container.y = this.config.height - this.playBtn.height - container.height;
+      container.y = 0.92 * this.config.height;
     }
   }
 

@@ -74,8 +74,8 @@ export class Game extends PIXI.Application {
   }
 
   builds(pageNum) {
-    this.buildLastPage();
-    return;
+    // this.buildLastPage();
+    // return;
     this.buildBoard(pageNum);
     this.buildHand();
   }
