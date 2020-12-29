@@ -29,6 +29,7 @@ export class Game extends PIXI.Application {
   emitterControl() {
     this.emitter.on('theAnd', this.nextToFinishPage.bind(this));
     this.emitter.on('handPaus', this.handAnimStop.bind(this));
+    this.emitter.on('retry', this.retry, this);
   }
 
   _rebuildStage(pageNum = 1) {
@@ -46,6 +47,11 @@ export class Game extends PIXI.Application {
     this.builds(pageNum);
   }
 
+  retry() {
+    console.warn('hasar retry');
+    this._rebuildStage(1);
+  }
+
   _startLoading() {
     this.loader.add('title', 'assets/ui/logo.png');
     this.loader.add('like', 'assets/ui/icon_like.png');
@@ -56,10 +62,10 @@ export class Game extends PIXI.Application {
     this.loader.add('2b', 'assets/furniture/2b.png');
     this.loader.add('3a', 'assets/furniture/3a.png');
     this.loader.add('3b', 'assets/furniture/3b.png');
-    this.loader.add('4a', 'assets/ui/cta_apt2b_cloverdale_sofa_half.png');
-    this.loader.add('4b', 'assets/ui/cta_apt2b_melrose_sofa_half.png');
-    this.loader.add('4c', 'assets/ui/cta_apt2b_scott_sofa_half.png');
-    this.loader.add('4d', 'assets/ui/cta_dwr_bantam73_sofa_half.png');
+    this.loader.add('a1', 'assets/ui/cta_apt2b_cloverdale_sofa_half.png');
+    this.loader.add('a2', 'assets/ui/cta_apt2b_melrose_sofa_half.png');
+    this.loader.add('a3', 'assets/ui/cta_apt2b_scott_sofa_half.png');
+    this.loader.add('a4', 'assets/ui/cta_dwr_bantam73_sofa_half.png');
     this.loader.add('button1', 'assets/ui/button.png');
     this.loader.add('button2', 'assets/ui/button1.png');
     this.loader.load(() => {
@@ -113,12 +119,14 @@ export class Game extends PIXI.Application {
     tl.to(hand, { pixi: { alpha: 0, scaleX: 0.5, scaleY: 0.5 }, duration: 0.5 });
     this.tl = tl;
   }
+
   handAnimStop() {
     gsap.killTweensOf(this.hand);
     gsap.to(this.hand, { pixi: { alpha: 0 } });
     this.animation(this.hand);
     // timeline.killTweensOf(this.hand);
   }
+
   nextToFinishPage() {
     this.board.destroy();
     gsap.killTweensOf(this.hand);
@@ -126,9 +134,10 @@ export class Game extends PIXI.Application {
     this.stage.children[0].destroy();
     this.buildLastPage();
   }
+
   buildLastPage() {
     const config = this.config;
     const board = new LastPage(config);
-    this.stage.addChild(board);
+    this.stage.addChild((this.lastBoard = board));
   }
 }

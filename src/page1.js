@@ -65,7 +65,6 @@ export class Page extends PIXI.Container {
       this.emitter.emit('handPaus');
     }
     if (pageNum > 3) {
-      console.warn('sasa');
       this.emitter.emit('theAnd');
       return;
     }
