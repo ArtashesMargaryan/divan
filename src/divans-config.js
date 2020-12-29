@@ -54,7 +54,7 @@ function getDivansPortriateConfig() {
       anchor: { x: 1, y: 0.5 },
       grid: {
         x: -0.255,
-        y: 0.2,
+        y: 0.232,
         width: 0.7,
         height: 0.27,
         align: { x: 1, y: 0.5 },
@@ -76,7 +76,7 @@ function getDivansPortriateConfig() {
       anchor: { x: 0, y: 0.5 },
       grid: {
         x: 0.55,
-        y: 0.2,
+        y: 0.232,
         width: 0.7,
         height: 0.27,
         align: { x: 0, y: 0.5 },

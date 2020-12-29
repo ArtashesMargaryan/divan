@@ -62,7 +62,7 @@ export class LastPage extends PIXI.Container {
         (3 * this.config.width) / (7 * this.title.width),
         (this.config.height * 0.4) / this.title.height
       );
-      this.titleContenier.position.set(this.config.width / 2, 0.18 * this.config.height);
+      this.titleContenier.position.set(this.config.width / 2, 0.12 * this.config.height);
       this.titleContenier.children.width = 50;
     } else {
       scaleTitle = Math.min(
