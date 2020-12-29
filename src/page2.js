@@ -4,6 +4,7 @@ import { PixiPlugin } from 'gsap/PixiPlugin';
 import { getEmitter } from './game';
 import { strategy } from 'webpack-merge';
 import { SofaComponent } from './sofa-component';
+import { getDivansConfig } from './divans-config';
 
 export class LastPage extends PIXI.Container {
   constructor(config) {
@@ -125,38 +126,41 @@ export class LastPage extends PIXI.Container {
   }
 
   toCorentDivan(pageType) {
-    const divanCount = this.config.divanCount;
-    if (this.pageType === 'x') {
-      for (let i = 1; i <= divanCount; i++) {
-        const divan = this.buildDivan(i);
-        this.addChild(divan);
-        divan.x =
-          this.titleContenier.x +
-          Math.pow(-1, i) * ((2 / 3) * this.titleContenier.width) +
-          (Math.pow(-1, i) * (1 * divan.width)) / 2;
-        divan.y = this.titleContenier.y;
-        if (i > 2) {
-          divan.y += this.titleContenier.y + divan.height + this.config.height / 8;
-        }
-      }
-    } else {
-      for (let i = 1; i <= divanCount; i++) {
-        const divan = this.buildDivan(i);
-        this.addChild(divan);
-        this.divanScaleing(divan);
-        divan.x =
-          this.titleContenier.x +
-          Math.pow(-1, i) * Math.min(200, this.config.height / 25) +
-          (Math.pow(-1, i) * (1 * divan.width)) / 2;
-        divan.y = this.rectContainer.y + this.rectContainer.height + this.config.height / 10;
-        if (i > 2) {
-          divan.y = this.config.height / 2 + this.config.height / 8 + this.config.height / 8;
-          console.warn(divan.y);
-        }
-        console.warn(this.config.height / 5, this.config.width * 0.45);
-        this.divanScaleing(divan, this.config.height / 5, this.config.width * 0.45);
-      }
-    }
+    const orientation = window.innerWidth > window.innerHeight ? 'landscape' : 'portriate';
+    const divansConfig = getDivansConfig(orientation);
+    divansConfig.forEach((divanConfig) => {
+      const { frameName, grid, anchor } = divanConfig;
+
+      const rect = new PIXI.Rectangle(
+        grid.x * window.innerWidth,
+        grid.y * window.innerHeight,
+        grid.width * window.innerWidth,
+        grid.height * window.innerHeight
+      );
+
+      const divan = new SofaComponent(frameName, anchor);
+      divan.pivot.set(anchor.x * divan.width, anchor.y * divan.height);
+      divan.position.set(rect.x + rect.width * grid.align.x, rect.y + rect.height * grid.align.y);
+
+      const scaleX = rect.width / divan.width;
+      const scaleY = rect.height / divan.height;
+
+      const scale = Math.min(1, scaleX, scaleY);
+
+      divan.scale.set(scale);
+      ///grid-na
+      const gr = new PIXI.Graphics();
+      gr.beginFill(0xff0000, 0.5);
+      gr.drawRect(
+        grid.x * window.innerWidth,
+        grid.y * window.innerHeight,
+        grid.width * window.innerWidth,
+        grid.height * window.innerHeight
+      );
+      gr.endFill();
+      this.addChild(gr);
+      this.addChild(divan);
+    });
   }
 
   divanScaleing(divan, hMax, wMax) {
@@ -205,48 +209,4 @@ export class LastPage extends PIXI.Container {
   retryGame() {
     this.emitter.emit('retry');
   }
-
-  // /***0.45 and 0.3 push in config */
-  // buildDivansPortret() {
-  //   const w = this.config.width * 0.45;
-  //   const h = this.config.height * 0.3;
-  //   const divan1 = new SofaComponent('4a', [-1, 0, 2, 0]);
-  //   this.addChild(divan1);
-  //   divan1.editPosition(0, h);
-  //   gsap.to(divan1, { pixi: { x: w, y: h }, duration: 1 });
-  //   this.checkItem(divan1, 0.45, 0.3);
-  //   const divan2 = new SofaComponent('4b', [-1, 0, 2, 0]);
-  //   this.addChild(divan2);
-  //   divan2.editPosition(0, (3 * this.config.height) / 5);
-  //   gsap.to(divan2, { pixi: { x: w, y: (3 * this.config.height) / 5 }, duration: 1 });
-
-  //   const divan3 = new SofaComponent('4c', [-1, 0, 2, 0]);
-  //   this.addChild(divan3);
-  //   divan3.editPosition(this.config.width + divan3.width, h);
-  //   gsap.to(divan3, {
-  //     pixi: { x: 0.55 * this.config.width + divan3.width, y: h },
-  //     duration: 1,
-  //   });
-
-  //   const divan4 = new SofaComponent('4d', [-1, 0, 2, 0]);
-  //   this.addChild(divan4);
-  //   divan4.editPosition(this.config.width + divan4.width, (3 * this.config.height) / 5);
-  //   gsap.to(divan4, {
-  //     pixi: { x: 0.55 * this.config.width + divan3.width, y: (3 * this.config.height) / 5 },
-  //     duration: 1,
-  //   });
-  // }
-
-  // checkItem(item, xScale, yScale) {
-  //   const { width, height } = this.config;
-  //   if (item.width * 0.55 <= width * xScale && item.height <= height.yScale) {
-  //     return;
-  //   }
-  //   item.scale.set(Math.min(((xScale * width) / item.width, (yScale * height) / item.height)));
-  // }
-
-  // toCorentScale(obj) {
-  //   const ret = Math.min((this.config.width * 0.24) / obj.width, this.config.height / (4.6 * obj.height));
-  //   return ret;
-  // }
 }
